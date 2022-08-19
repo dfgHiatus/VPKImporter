@@ -4,9 +4,9 @@ using FrooxEngine;
 using HarmonyLib;
 using NeosModLoader;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace VPKImporter
 {
@@ -30,7 +30,7 @@ namespace VPKImporter
         [AutoRegisterConfigKey]
         private static ModConfigurationKey<bool> importAsRawFiles =
             new("importAsRawFiles",
-            "Import files directly into Neos. VPKs Packages can be very large, keep this true unless you know what you're doing!",
+            "Import files directly into Neos. VPKs can be very large, keep this true unless you know what you're doing!",
             () => true);
         [AutoRegisterConfigKey]
         private static ModConfigurationKey<bool> importText =
@@ -63,7 +63,6 @@ namespace VPKImporter
             _config = GetConfiguration();
             Directory.CreateDirectory(_cachePath);
         }
-
 
         [HarmonyPatch(typeof(UniversalImporter), "Import", typeof(AssetClass), typeof(IEnumerable<string>),
             typeof(World), typeof(float3), typeof(floatQ), typeof(bool))]
