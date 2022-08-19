@@ -8,8 +8,8 @@ namespace VPKImporter
     public class VPKExtractor
     {
         private static readonly string executablePath = Path.Combine("nml_mods", "vpk_extractor");
-        private static readonly string windowsExecutable = ".\'Decompiler.exe";
-        private static readonly string windowsArgs = "-i {0} -o {1} -d --gltf_export_materials"; // We could add --threads X here lol
+        private static readonly string windowsExecutable = "Decompiler.exe";
+        private static readonly string windowsArgs = "-i {0} -o {1} -d --gltf_export_materials"; // We can also add --threads X
         private static readonly string macOSXCommand;
         private static readonly string unixCommand;
         public static void Unpack(string inputFile, string outputPath)
@@ -38,9 +38,11 @@ namespace VPKImporter
 
         private static void PerformWindowsUnpack (string inputFile, string outputPath)
         {
-            var windowsExecutablePath = Path.Combine(executablePath, windowsExecutable);
-            var formattedWindowsArgs = string.Format(windowsArgs, inputFile, outputPath);
+            var windowsExecutablePath = Path.GetFullPath(Path.Combine(executablePath, windowsExecutable));
+            if (!File.Exists(windowsExecutablePath))
+                throw new FileNotFoundException("Could not find ValveResourceFormat decompiler. Is it present under nml_mods/vpk_extractor/Decompiler.exe?");
 
+            var formattedWindowsArgs = string.Format(windowsArgs, inputFile, outputPath);
             var process = new Process();
             process.StartInfo.FileName = windowsExecutablePath;
             process.StartInfo.Arguments = formattedWindowsArgs;

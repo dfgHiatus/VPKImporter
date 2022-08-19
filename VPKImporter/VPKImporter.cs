@@ -71,30 +71,57 @@ namespace VPKImporter
         {
             public static bool Prefix(ref IEnumerable<string> files)
             {
-                Msg("file size " + files.Count());
-                List<string> hasUnityPackage = new();
-                List<string> notUnityPackage = new();
+                List<string> hasVPK = new();
+                List<string> noVPK = new();
                 foreach (var file in files)
                 {
                     if (Path.GetExtension(file).ToLower().Equals(".vpk"))
-                        hasUnityPackage.Add(file);
+                        hasVPK.Add(file);
                     else
-                        notUnityPackage.Add(file);
+                        noVPK.Add(file);
                 }
 
                 List<string> allDirectoriesToBatchImport = new();
-                foreach (var dir in DecomposeVPKs(hasUnityPackage.ToArray()))
+                foreach (var dir in DecomposeVPKs(hasVPK.ToArray()))
                     allDirectoriesToBatchImport.AddRange(Directory.GetFiles(dir, "*", SearchOption.AllDirectories)
                         .Where(ShouldImportFile).ToArray());
 
-                var slot = Engine.Current.WorldManager.FocusedWorld.AddSlot("Unity Package import");
+                var slot = Engine.Current.WorldManager.FocusedWorld.AddSlot("VPK Import");
                 slot.PositionInFrontOfUser();
                 BatchFolderImporter.BatchImport(slot, allDirectoriesToBatchImport, _config.GetValue(importAsRawFiles));
 
-                if (notUnityPackage.Count <= 0) return false;
-                files = notUnityPackage.ToArray();
+                if (noVPK.Count <= 0) return false;
+                files = noVPK.ToArray();
                 return true;
             }
+        }
+
+        private static string[] DecomposeVPKs(string[] files)
+        {
+            var fileToHash = files.ToDictionary(file => file, Utils.GenerateMD5);
+            HashSet<string> dirsToImport = new();
+            HashSet<string> vpksToDecompress = new();
+            foreach (var element in fileToHash)
+            {
+                var dir = Path.Combine(_cachePath, element.Value);
+                if (!Directory.Exists(dir))
+                    vpksToDecompress.Add(element.Key);
+                else
+                    dirsToImport.Add(dir);
+            }
+            foreach (var package in vpksToDecompress)
+            {
+                var packageName = Path.GetFileNameWithoutExtension(package);
+                if (Utils.ContainsUnicodeCharacter(packageName))
+                {
+                    Error("Imported VPK cannot have unicode characters in its file name.");
+                    continue;
+                }
+                var extractedPath = Path.Combine(_cachePath, fileToHash[package]);
+                VPKExtractor.Unpack(package, extractedPath);
+                dirsToImport.Add(extractedPath);
+            }
+            return dirsToImport.ToArray();
         }
 
         private static bool ShouldImportFile(string file)
@@ -109,34 +136,6 @@ namespace VPKImporter
             (_config.GetValue(importAudio) && assetClass == AssetClass.Audio) ||
             (_config.GetValue(importFont) && assetClass == AssetClass.Font) ||
             (_config.GetValue(importVideo) && assetClass == AssetClass.Video);
-        }
-
-        private static string[] DecomposeVPKs(string[] files)
-        {
-            var fileToHash = files.ToDictionary(file => file, Utils.GenerateMD5);
-            HashSet<string> dirsToImport = new();
-            HashSet<string> unityPackagesToDecompress = new();
-            foreach (var element in fileToHash)
-            {
-                var dir = Path.Combine(_cachePath, element.Value);
-                if (!Directory.Exists(dir))
-                    unityPackagesToDecompress.Add(element.Key);
-                else
-                    dirsToImport.Add(dir);
-            }
-            foreach (var package in unityPackagesToDecompress)
-            {
-                var modelName = Path.GetFileNameWithoutExtension(package);
-                if (Utils.ContainsUnicodeCharacter(modelName))
-                {
-                    Error("Imported VPK cannot have unicode characters in its file name.");
-                    continue;
-                }
-                var extractedPath = Path.Combine(_cachePath, fileToHash[package]);
-                VPKExtractor.Unpack(package, extractedPath);
-                dirsToImport.Add(extractedPath);
-            }
-            return dirsToImport.ToArray();
         }
     }
 }
