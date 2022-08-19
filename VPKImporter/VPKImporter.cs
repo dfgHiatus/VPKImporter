@@ -30,7 +30,7 @@ namespace VPKImporter
         [AutoRegisterConfigKey]
         private static ModConfigurationKey<bool> importAsRawFiles =
             new("importAsRawFiles",
-            "Import files directly into Neos. Unity Packages can be very large, keep this true unless you know what you're doing!",
+            "Import files directly into Neos. VPKs Packages can be very large, keep this true unless you know what you're doing!",
             () => true);
         [AutoRegisterConfigKey]
         private static ModConfigurationKey<bool> importText =
@@ -59,7 +59,7 @@ namespace VPKImporter
 
         public override void OnEngineInit()
         {
-            new Harmony("net.dfgHiatus.UnityPackageImporter").PatchAll();
+            new Harmony("net.dfgHiatus.VPKImporter").PatchAll();
             _config = GetConfiguration();
             Directory.CreateDirectory(_cachePath);
         }
