@@ -26,8 +26,8 @@ Presently, it supports:
 - And raw binary variants of the above for file sharing
 
 ## Known Issues and Limitations
+- Presently, THIS WILL FREEZE NEOS DURING IMPORT. Recommended to import one VPK at a time, pairs nicely with [NeosModSettings](https://github.com/badhaloninja/NeosModSettings)
 - The importer doesn't place files under a single root, which can be a little messy
-- This might hang a little bit during import. Recommended to import one VPK at a time, pairs nicely with [NeosModSettings](https://github.com/badhaloninja/NeosModSettings)
 - Should be able to mix and match packages with the import of other files, currently untested
 
 *This mod has the capacity to run on MacOS and Linux, although in its present state the functionality for it is yet to be added.
