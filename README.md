@@ -1,6 +1,6 @@
 # VPKImporter
 
-A [NeosModLoader](https://github.com/zkxs/NeosModLoader) mod for extracts and imports [VPK](https://developer.valvesoftware.com/wiki/VPK_File_Format) files into [Neos VR](https://neos.com/).
+A [NeosModLoader](https://github.com/zkxs/NeosModLoader) mod for extracts and imports [VPK](https://developer.valvesoftware.com/wiki/VPK_File_Format) files into [Neos VR](https://neos.com/). 
 
 ## Installation
 1. Install [NeosModLoader](https://github.com/zkxs/NeosModLoader).
@@ -27,6 +27,7 @@ Presently, it supports:
 
 ## Known Issues and Limitations
 - Presently, THIS WILL FREEZE NEOS DURING IMPORT. Recommended to import one VPK at a time, pairs nicely with [NeosModSettings](https://github.com/badhaloninja/NeosModSettings)
+- Source 1 VPKs are not supported at this time.
 - The importer doesn't place files under a single root, which can be a little messy
 - Should be able to mix and match packages with the import of other files, currently untested
 
