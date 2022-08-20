@@ -19,7 +19,7 @@ namespace VPKImporter
             var platform = Environment.OSVersion.Platform;
             switch (platform)
             {
-                // According to https://docs.microsoft.com/en-us/dotnet/api/system.platformid?view=netframework-4.7.2
+                // According to https://docs.microsoft.com/en-us/dotnet/api/system.platformid?view=netframework-4.7a.2
                 // some platform enums are no longer in use. I've left them here:
                 // - case PlatformID.Win32S
                 // - case PlatformID.Win32Windows

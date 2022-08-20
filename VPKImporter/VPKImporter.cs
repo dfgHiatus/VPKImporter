@@ -140,7 +140,8 @@ namespace VPKImporter
             (_config.GetValue(importPointCloud) && assetClass == AssetClass.PointCloud) ||
             (_config.GetValue(importAudio) && assetClass == AssetClass.Audio) ||
             (_config.GetValue(importFont) && assetClass == AssetClass.Font) ||
-            (_config.GetValue(importVideo) && assetClass == AssetClass.Video);
+            (_config.GetValue(importVideo) && assetClass == AssetClass.Video) ||
+                file.EndsWith(".vpk");
         }
     }
 }
