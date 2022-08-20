@@ -141,7 +141,7 @@ namespace VPKImporter
             (_config.GetValue(importAudio) && assetClass == AssetClass.Audio) ||
             (_config.GetValue(importFont) && assetClass == AssetClass.Font) ||
             (_config.GetValue(importVideo) && assetClass == AssetClass.Video) ||
-                file.EndsWith(".vpk");
+                Path.GetExtension(file).ToLower().EndsWith(".vpk");
         }
     }
 }
