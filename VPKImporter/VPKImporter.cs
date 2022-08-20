@@ -33,6 +33,11 @@ namespace VPKImporter
             "Import files directly into Neos. VPKs can be very large, keep this true unless you know what you're doing!",
             () => true);
         [AutoRegisterConfigKey]
+        private static ModConfigurationKey<byte> optionalThreadCount =
+            new("optionalThreadCount",
+            "Additional thread count. This may speed up imports in some circumstances, large numbers may be unstable (~8<). Leave at 0 for no multithreading.",
+            () => 0);
+        [AutoRegisterConfigKey]
         private static ModConfigurationKey<bool> importText =
             new("importText", "Import Text", () => true);
         [AutoRegisterConfigKey]
@@ -113,11 +118,12 @@ namespace VPKImporter
                 var packageName = Path.GetFileNameWithoutExtension(package);
                 if (Utils.ContainsUnicodeCharacter(packageName))
                 {
-                    Error("Imported VPK cannot have unicode characters in its file name.");
+                    Error($"Imported VPK {packageName} cannot have unicode characters in its file name.");
                     continue;
                 }
                 var extractedPath = Path.Combine(_cachePath, fileToHash[package]);
-                VPKExtractor.Unpack(package, extractedPath);
+                Directory.CreateDirectory(extractedPath);
+                VPKExtractor.Unpack(package, extractedPath, _config.GetValue(optionalThreadCount));
                 dirsToImport.Add(extractedPath);
             }
             return dirsToImport.ToArray();

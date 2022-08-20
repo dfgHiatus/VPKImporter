@@ -1,7 +1,7 @@
-﻿using BaseX;
-using System;
+﻿using System;
 using System.IO;
 using System.Diagnostics;
+using BaseX;
 
 namespace VPKImporter
 {
@@ -9,10 +9,12 @@ namespace VPKImporter
     {
         private static readonly string executablePath = Path.Combine("nml_mods", "vpk_extractor");
         private static readonly string windowsExecutable = "Decompiler.exe";
-        private static readonly string windowsArgs = "-i {0} -o {1} -d --gltf_export_materials"; // We can also add --threads X
+        private static readonly string windowsArgs = "-i {0} -o {1} -d --gltf_export_materials";
+        private static readonly string windowsArgsThreaded = "-i {0} -o {1} -d --gltf_export_materials --threads {2}";
         private static readonly string macOSXCommand;
         private static readonly string unixCommand;
-        public static void Unpack(string inputFile, string outputPath)
+
+        public static void Unpack(string inputFile, string outputPath, byte optionalThreads)
         {
             var platform = Environment.OSVersion.Platform;
             switch (platform)
@@ -25,7 +27,7 @@ namespace VPKImporter
                 // - case PlatformID.Xbox:
 
                 case PlatformID.Win32NT:
-                    PerformWindowsUnpack(inputFile, outputPath);
+                    PerformWindowsUnpack(inputFile, outputPath, optionalThreads);
                     break;
                 case PlatformID.Unix:
                     throw new PlatformNotSupportedException("Unix support has not been added yet! Scream at dfg if you see this!");
@@ -36,39 +38,43 @@ namespace VPKImporter
             }
         }
 
-        private static void PerformWindowsUnpack (string inputFile, string outputPath)
+        private static void PerformWindowsUnpack (string inputFile, string outputPath, byte optionalThreads)
         {
             var windowsExecutablePath = Path.GetFullPath(Path.Combine(executablePath, windowsExecutable));
             if (!File.Exists(windowsExecutablePath))
                 throw new FileNotFoundException("Could not find ValveResourceFormat decompiler. Is it present under nml_mods/vpk_extractor/Decompiler.exe?");
 
-            var formattedWindowsArgs = string.Format(windowsArgs, inputFile, outputPath);
+            string formattedWindowsArgs;
+            if (optionalThreads > 0)
+                formattedWindowsArgs = string.Format(windowsArgsThreaded, inputFile, outputPath, optionalThreads); // 1-255 Threads ;)
+            else
+                formattedWindowsArgs = string.Format(windowsArgs, inputFile, outputPath);
+
+            UniLog.Log($"Starting VPK extraction with the following command: {windowsExecutablePath} {formattedWindowsArgs}");
+
             var process = new Process();
             process.StartInfo.FileName = windowsExecutablePath;
             process.StartInfo.Arguments = formattedWindowsArgs;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            process.OutputDataReceived += OnWindowsOutput;
+            process.StartInfo.UseShellExecute = true;
+            process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             process.Start();
-            process.BeginOutputReadLine();
             process.WaitForExit();
+
+            UniLog.Log("VPK extraction complete!");
+
+            // Writing to logs en masse can actually hang the application. Don't spam!
+            // https://stackoverflow.com/questions/139593/processstartinfo-hanging-on-waitforexit-why
         }
 
-        private static void OnWindowsOutput(object sender, DataReceivedEventArgs e)
+        private static void PerformMacOSXUnpack (string inputFile, string outputPath, int? optionalThreads)
         {
-            UniLog.Log(e.Data);
+            throw new NotImplementedException();
         }
 
-        private static void PerformMacOSXUnpack(string inputFile, string outputPath)
+        private static void PerformUniXUnpack (string inputFile, string outputPath, int? optionalThreads)
         {
-
-        }
-
-        private static void PerformUniXUnpack(string inputFile, string outputPath)
-        {
-
+            throw new NotImplementedException();
         }
     }
 }
