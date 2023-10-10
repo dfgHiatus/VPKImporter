@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("VPKImporter")]
-[assembly: AssemblyDescription("A NeosModLoader mod for extracts and imports VPK files into Neos VR.")]
+[assembly: AssemblyDescription("A ResoniteModLoader mod for extracts and imports VPK files into Resonite.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hiatus Labs")]
 [assembly: AssemblyProduct("VPKImporter")]
